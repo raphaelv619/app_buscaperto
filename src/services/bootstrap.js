@@ -4,9 +4,9 @@ import { Actions } from 'react-native-router-flux';
 class Bootstrap {
     async init() {
         try {
+            await global.network.check();
             await global.db.init();
             await global.user.init();
-            await global.network.check();
             this.splashHide();
             return "initialized";
         } catch (e) {
