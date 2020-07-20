@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "773193854403",
+    "firebase_url": "https://busca-perto.firebaseio.com",
+    "project_id": "busca-perto",
+    "storage_bucket": "busca-perto.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:773193854403:android:cab453bdbd72afe3d5a176",
+        "android_client_info": {
+          "package_name": "com.buscaperto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "773193854403-vr9q8hbl9g2n89lvgdsvk7pildobpm32.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANfaVxDIiYx50Z3ipQhAwWMNWudDFWv2c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "773193854403-vr9q8hbl9g2n89lvgdsvk7pildobpm32.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
