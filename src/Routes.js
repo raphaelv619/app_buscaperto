@@ -22,7 +22,7 @@ export default props => (
 
         <Scene key="root" hideNavBar>
 
-            <Stack key="login" hideNavBar>
+            <Stack key="stack0" hideNavBar>
                 <Scene key='bemvindo' hideDrawerButton component={Bemvindo} hideNavBar />
                 <Scene key='login' hideDrawerButton component={Login} hideNavBar />
                 <Scene key='signin' hideDrawerButton component={Signin} hideNavBar />

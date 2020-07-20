@@ -5,8 +5,9 @@ import { colors, p } from '../../../styles';
 import { Button, Content, Icon, Input } from '../../../components';
 import { userLogin } from '../../../actions';
 import { Actions } from 'react-native-router-flux';
+import { connect } from 'react-redux';
 
-export default class Login extends Component {
+class Login extends Component {
 
     constructor(props) {
         super(props);
@@ -39,7 +40,7 @@ export default class Login extends Component {
             return;
         }
 
-        userLogin(obj.login, obj.password);
+        this.props.userLogin(obj.login, obj.password);
 
     }
 
@@ -125,4 +126,12 @@ export default class Login extends Component {
         );
     }
 }
+
+const mapStateToProps = state => (
+    {
+       
+    }
+)
+
+export default connect(mapStateToProps, { userLogin })(Login);
 

@@ -63,7 +63,7 @@ class App extends Component {
                     Actions.replace('favoritos')
                 }
             } else {
-                Actions.reset("login");
+                Actions.reset("stack0");
             }
         }).catch((err) => {
             console.log("bootstrap error", err);

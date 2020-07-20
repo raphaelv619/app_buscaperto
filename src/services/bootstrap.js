@@ -19,12 +19,12 @@ class Bootstrap {
     splashHide() {
         setTimeout(() => {
             SplashScreen.hide();
-        }, 2000);
+        }, 1000);
     }
 
     logout() {
         global.user.logout();
-        Actions.reset('login');
+        Actions.reset('stack0');
     }
 }
 
