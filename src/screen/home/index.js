@@ -49,7 +49,6 @@ class Home extends Component {
     }
 
     getData(location, type) {
-        console.log('loccccccccc', location)
         this.setState({ loading: true });
         global.maps.getAll(location, type).then(res => {
             if (res.results.length > 0) {
@@ -62,26 +61,32 @@ class Home extends Component {
                         global.maps.getFoto(foto_id).then(ret => {
                             res.results[i].uri_foto = ret;
                             if (i == res.results.length - 1) {
-                                this.setState({ arr: res.results, loading: false })
-                                let favs = global.user.favoritos;
-                                let id = this.state.selectedCategoria.id
-                                if (favs.indexOf(id) != -1) {
-                                    this.setState({ heart: true })
-                                    global.user.updateList(favs.indexOf(id), res.results)
-                                }
+                                setTimeout(() => {
+
+                                    this.setState({ arr: res.results, loading: false, change: this.state.change + 1 })
+                                    let favs = global.user.favoritos;
+                                    let id = this.state.selectedCategoria.id
+                                    if (favs.indexOf(id) != -1) {
+                                        this.setState({ heart: true, change: this.state.change + 1 })
+                                        global.user.updateList(favs.indexOf(id), res.results)
+                                    }
+                                }, 500)
                             }
                         }).catch(err => {
                             console.log('err', err)
                         })
                     } else {
                         if (i == res.results.length - 1) {
-                            this.setState({ arr: res.results, loading: false })
-                            let favs = global.user.favoritos;
-                            let id = this.state.selectedCategoria.id
-                            if (favs.indexOf(id) != -1) {
-                                this.setState({ heart: true })
-                                global.user.updateList(favs.indexOf(id), res.results)
-                            }
+                            setTimeout(() => {
+
+                                this.setState({ arr: res.results, loading: false, change: this.state.change + 1 })
+                                let favs = global.user.favoritos;
+                                let id = this.state.selectedCategoria.id
+                                if (favs.indexOf(id) != -1) {
+                                    this.setState({ heart: true, change: this.state.change + 1 })
+                                    global.user.updateList(favs.indexOf(id), res.results)
+                                }
+                            }, 500)
                         }
                     }
                 }
@@ -96,7 +101,7 @@ class Home extends Component {
     }
 
     atualiza(categoria) {
-        this.setState({ selectedCategoria: categoria, heart: false, arr:[] })
+        this.setState({ selectedCategoria: categoria, heart: false, arr: [] })
         this.getData(`${global.geolocation.lat}, ${global.geolocation.lng}`, categoria.type)
     }
 
@@ -215,8 +220,8 @@ class Home extends Component {
                 </View>
             )
         }
-        if(!this.state.selectedCategoria && !global.network.isConnected){
-            return(
+        if (!this.state.selectedCategoria && !global.network.isConnected) {
+            return (
                 <Text style={[p.fsDef, p.ffBold, p.mt12, p.ml8]}>Você está offline, caso tenha favoritado alguma categoria, você pode ver os dados das últimas pesquisas na aba Favoritos</Text>
             )
         }

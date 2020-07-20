@@ -55,9 +55,11 @@ export default class DetalhesEstabelecimento extends Component {
         let retStr = '';
 
         if (str.indexOf('Monday') != -1) {
-            let rpl = str.replace(/Monday:/g, "Segunda-feira");
+            let rpl = str.replace(/Monday/g, "Segunda-feira");
             if (rpl.indexOf('Closed') != -1) {
                 retStr = rpl.replace(/Closed/g, "Fechado");
+            } else if(rpl.indexOf('Open 24 hours')) {
+                retStr = rpl.replace(/Open 24 hours/g, "Aberto 24 horas")
             } else {
                 retStr = rpl;
             }
@@ -65,6 +67,8 @@ export default class DetalhesEstabelecimento extends Component {
             let rpl = str.replace(/Tuesday/g, "Terça-feira");
             if (rpl.indexOf('Closed') != -1) {
                 retStr = rpl.replace(/Closed/g, "Fechado");
+            } else if(rpl.indexOf('Open 24 hours')) {
+                retStr = rpl.replace(/Open 24 hours/g, "Aberto 24 horas")
             } else {
                 retStr = rpl;
             }
@@ -72,6 +76,8 @@ export default class DetalhesEstabelecimento extends Component {
             let rpl = str.replace(/Wednesday/g, "Quarta-feira");
             if (rpl.indexOf('Closed') != -1) {
                 retStr = rpl.replace(/Closed/g, "Fechado");
+            } else if(rpl.indexOf('Open 24 hours')) {
+                retStr = rpl.replace(/Open 24 hours/g, "Aberto 24 horas")
             } else {
                 retStr = rpl;
             }
@@ -79,6 +85,8 @@ export default class DetalhesEstabelecimento extends Component {
             let rpl = str.replace(/Thursday/g, "Quinta-feira");
             if (rpl.indexOf('Closed') != -1) {
                 retStr = rpl.replace(/Closed/g, "Fechado");
+            } else if(rpl.indexOf('Open 24 hours')) {
+                retStr = rpl.replace(/Open 24 hours/g, "Aberto 24 horas")
             } else {
                 retStr = rpl;
             }
@@ -86,6 +94,8 @@ export default class DetalhesEstabelecimento extends Component {
             let rpl = str.replace(/Friday/g, "Sexta-feira");
             if (rpl.indexOf('Closed') != -1) {
                 retStr = rpl.replace(/Closed/g, "Fechado");
+            } else if(rpl.indexOf('Open 24 hours')) {
+                retStr = rpl.replace(/Open 24 hours/g, "Aberto 24 horas")
             } else {
                 retStr = rpl;
             }
@@ -93,6 +103,8 @@ export default class DetalhesEstabelecimento extends Component {
             let rpl = str.replace(/Saturday/g, "Sábado");
             if (rpl.indexOf('Closed') != -1) {
                 retStr = rpl.replace(/Closed/g, "Fechado");
+            } else if(rpl.indexOf('Open 24 hours')) {
+                retStr = rpl.replace(/Open 24 hours/g, "Aberto 24 horas")
             } else {
                 retStr = rpl;
             }
@@ -100,6 +112,8 @@ export default class DetalhesEstabelecimento extends Component {
             let rpl = str.replace(/Sunday/g, "Domingo");
             if (rpl.indexOf('Closed') != -1) {
                 retStr = rpl.replace(/Closed/g, "Fechado");
+            } else if(rpl.indexOf('Open 24 hours')) {
+                retStr = rpl.replace(/Open 24 hours/g, "Aberto 24 horas")
             } else {
                 retStr = rpl;
             }
