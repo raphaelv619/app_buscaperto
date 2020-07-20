@@ -10,7 +10,7 @@ class FirebaseRest {
                     profile.email = email;
                     profile.uid = res.user.uid;
                     profile.password = password;
-                    if (profile.foto != '') {
+                    if (profile.foto != '' && profile.foto != undefined) {
                         let name = `${new Date().getTime()}_${Math.random(1000, 9999)}.jpg`;
                         this.uploadToStorage(fields.foto, 'imagens', 'image/jpeg', name).then((ret) => {
                             profile.foto = ret.downloadURL;
@@ -33,7 +33,6 @@ class FirebaseRest {
         return new Promise((resolve, reject) => {
             firebaseDB.auth().signInWithEmailAndPassword(email, password)
                 .then(res => {
-                    console.log('ressssssss', res)
                     firebaseDB.database().ref(`${global.config.bancoFirebase}/users/${res.user.uid}`).once('value').then(ret => {
                         resolve(ret._value);
                     })
@@ -65,7 +64,7 @@ class FirebaseRest {
                 firebaseDB.database().ref(`${global.config.bancoFirebase}/users/${global.user.uuid}`).set(profile);
                 resolve(profile);
             }
-            
+
             // let currentPassword = global.user.myprofile.password;
             // if (email != global.user.myprofile.email) {
             //     this.reauthenticate(currentPassword).then(() => {
@@ -110,15 +109,15 @@ class FirebaseRest {
     // }
 
     forgotPassword = (email) => {
-      return new Promise((resolve, reject) => {
-          firebaseDB.auth().sendPasswordResetEmail(email)
-              .then(function (user) {
-                  resolve();
-              }).catch(function (e) {
-                  reject(e);
-                  console.log(e)
-              })
-      })
+        return new Promise((resolve, reject) => {
+            firebaseDB.auth().sendPasswordResetEmail(email)
+                .then(function (user) {
+                    resolve();
+                }).catch(function (e) {
+                    reject(e);
+                    console.log(e)
+                })
+        })
     }
 
     uploadToStorage(uri, folder, type, name) {

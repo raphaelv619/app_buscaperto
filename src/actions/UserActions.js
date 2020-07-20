@@ -14,7 +14,7 @@ export const userRegister = (email, password, fields) => {
             })
             .catch((err) => {
                 global.hide();
-                console.log('err', err.message);
+                // console.log('err', err.message);
                 let msg = err.message;
                 if (msg.indexOf('badly') != -1) {
                     global.alert.alert('E-mail inválido')

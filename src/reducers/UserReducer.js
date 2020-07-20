@@ -19,8 +19,12 @@ export default (state = INITIAL_STATE, action) => {
         case 'INIT_USER':
             let INIT_USER = { ...state };
             INIT_USER.foto = global.user.myprofile.foto;
-            console.log('akiiiiiiiiiiiiiiiiiii', INIT_USER)
             return INIT_USER;
+
+        case 'CLEAN_USER':
+            let CLEAN_USER = { ...state };
+            CLEAN_USER.foto = '';
+            return CLEAN_USER;
 
         case 'LOGIN_USUARIO_SUCESSO':
             return { ...state, ...INITIAL_STATE };

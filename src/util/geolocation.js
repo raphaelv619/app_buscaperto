@@ -4,8 +4,8 @@ import LaunchNavigator from 'react-native-launch-navigator';
 class GeolocationMeta {
 
     constructor(){
-        this.lat=null;
-        this.lng=null;
+        this.lat = null;
+        this.lng = null;
     }
 
 
@@ -18,13 +18,12 @@ class GeolocationMeta {
 
         return new Promise((resolve, reject) => {
             Geolocation.getCurrentPosition((res) => {
-                console.log('ressssss', res.coords)
                 this.lat = res.coords.latitude;
                 this.lng = res.coords.longitude;
-
                 let obj = res.coords;
                 resolve(obj);
             }, (err) => {
+                console.log('errrr', err)
                 reject(err);
                 global.alert.alert("Não foi possível conseguir a sua localização, verifique o GPS.");
             }, options);

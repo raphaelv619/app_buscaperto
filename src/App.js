@@ -32,7 +32,10 @@ class App extends Component {
                 }
             }
 
-            if (liberado) return;
+            if (liberado) {
+                global.geolocation.getCurrentPosition();
+                return
+            };
         }
 
         global.alert.alert("Para que você consiga interagir no app, será necessário aceitar todas as permissões solicitadas.", () => {

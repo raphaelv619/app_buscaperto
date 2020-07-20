@@ -127,7 +127,6 @@ class Header extends Component {
     }
 
     headerHome() {
-        console.log('userrr', global.user)
         return (
             <View style={[{ minHeight: 60 }]}>
                 <View style={[p.row, p.bgcSecondary, { height: 60 }, this.props.headerStyles ? this.props.headerStyles : {},]}>

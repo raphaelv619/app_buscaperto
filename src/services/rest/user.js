@@ -28,6 +28,7 @@ class User {
 
     logout() {
         this.uuid = null;
+        global.store.dispatch(modificaCampo("", "CLEAN_USER", ""));
         this.syncDb();
     }
 

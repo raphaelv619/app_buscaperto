@@ -37,6 +37,7 @@ export class Node {
 
     _axios(link) {
         let headers = {};
+        console.log('linkkkk', link)
 
         headers['Accept'] = 'application/json';
         headers['Content-Type'] = 'application/json';

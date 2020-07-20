@@ -41,7 +41,6 @@ class Signin extends Component {
 
     render() {
 
-
         return (
 
             <Content
@@ -65,11 +64,20 @@ class Signin extends Component {
 
                                 <View style={[p.aiCenter, p.jCenter, { width: 130, height: 130, borderRadius: 100, overflow: 'hidden' }]}>
                                     {this.props.foto != '' ?
-                                        <Image
-                                            source={{ uri: this.props.foto }}
-                                            style={{ width: '100%', height: '100%', flex: 1 }}
-                                            resizeMode='cover'
-                                        /> :
+                                        this.props.foto != undefined ?
+
+                                            <Image
+                                                source={{ uri: this.props.foto }}
+                                                style={{ width: '100%', height: '100%', flex: 1 }}
+                                                resizeMode='cover'
+                                            />
+                                            :
+                                            <Image
+                                                source={require('../../../assets/images/man.png')}
+                                                style={{ width: '100%', height: '100%', flex: 1 }}
+                                                resizeMode='contain'
+                                            />
+                                        :
                                         <Image
                                             source={require('../../../assets/images/man.png')}
                                             style={{ width: '100%', height: '100%', flex: 1 }}

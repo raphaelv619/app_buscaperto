@@ -38,7 +38,7 @@ class Home extends Component {
         this.setState({ location });
         if (this.props.favorito) {
             if (global.network.isConnected) {
-                this.getData(location, this.props.favorito.type);
+                this.getData(`${global.geolocation.lat}, ${global.geolocation.lng}`, this.props.favorito.type);
             } else {
                 let favs = global.user.favoritos;
                 let id = this.props.favorito.id;
@@ -49,10 +49,10 @@ class Home extends Component {
     }
 
     getData(location, type) {
+        console.log('loccccccccc', location)
         this.setState({ loading: true });
         global.maps.getAll(location, type).then(res => {
             if (res.results.length > 0) {
-
                 for (let i = 0; i < res.results.length; i++) {
                     let ref = res.results[i];
                     let dist = global.geolocation.getDistance(global.geolocation.lat, global.geolocation.lng, ref.geometry.location.lat, ref.geometry.location.lng);
@@ -88,7 +88,6 @@ class Home extends Component {
             } else {
                 this.setState({ loading: false, arr: [] })
             }
-            console.log('ressssss', res)
         }).catch(err => {
             this.setState({ loading: false })
             console.log('errrr', err)
@@ -97,8 +96,8 @@ class Home extends Component {
     }
 
     atualiza(categoria) {
-        this.setState({ selectedCategoria: categoria, heart: false })
-        this.getData(this.state.location, categoria.type)
+        this.setState({ selectedCategoria: categoria, heart: false, arr:[] })
+        this.getData(`${global.geolocation.lat}, ${global.geolocation.lng}`, categoria.type)
     }
 
     favoritar() {
@@ -151,10 +150,10 @@ class Home extends Component {
                             </View>
                         }
                     </View>
-                    <View style={[p.ml8]}>
-                        <View style={[{ marginRight: 90 }, p.f1]}>
+                    <View style={[p.ml8, p.f1]}>
+                        <View style={[p.f1]}>
                             <View style={[p.f1]}>
-                                <Text style={[p.fsDef, p.ffBold, p.mr8]}>{item.name}</Text>
+                                <Text numberOfLines={2} style={[p.fsDef, p.ffBold, p.mr8, p.f1]}>{item.name}</Text>
                                 <View style={[p.row, p.aiCenter, p.mv4]}>
                                     <Icon name='route' type='FontAwesome5' size={16} style={[p.tcDark]} />
                                     <Text style={[p.ml8]}>{item.distancia}</Text>
@@ -171,9 +170,9 @@ class Home extends Component {
                                 }
 
                             </View>
-                            <View>
+                            <View style={[p.f1, p.jEnd]}>
                                 <TouchableWithoutFeedback onPress={() => this.abreRota(item)}>
-                                    <View style={[p.bgcSecondary, p.p8, p.bRad8, { height: 40 }, p.aiCenter, p.jBetween, p.mr16, p.row]}>
+                                    <View style={[p.bgcSecondary, p.p8, p.bRad8, { height: 40 }, p.aiCenter, p.jBetween, p.row]}>
                                         <Text style={[p.tcDark, p.ffBold, p.fsRegular]}>Como chegar</Text>
                                         <Icon name='angle-right' type='FontAwesome5' size={18} style={[p.tcDark]} />
                                     </View>
@@ -199,7 +198,6 @@ class Home extends Component {
         }
         if (this.state.selectedCategoria && !this.state.loading) {
             return (
-                //false
                 <View style={[p.row, p.jBetween, p.aiCenter, p.ph8, !global.network.isConnected ? { marginTop: 12 } : {}]}>
                     <TouchableWithoutFeedback onPress={() => this.favoritar()}>
                         <View style={[p.row, p.aiCenter]}>

@@ -23,7 +23,7 @@ export const categorias = [
     {
         id: 3,
         nome: 'Baladas',
-        type: 'night_club ',
+        type: 'night_club',
         img: require('../../assets/images/categorias/night_club.jpg'),
         icon: 'music'
     },
@@ -51,7 +51,7 @@ export const categorias = [
     {
         id: 7,
         nome: 'Escolas',
-        type: 'school ',
+        type: 'school',
         img: require('../../assets/images/categorias/school.jpg'),
         icon: 'school'
     },
@@ -65,7 +65,7 @@ export const categorias = [
     {
         id: 9,
         nome: 'Farmácias',
-        type: 'drugstore ',
+        type: 'drugstore',
         img: require('../../assets/images/categorias/drugstore.jpg'),
         icon: 'capsules'
     },
