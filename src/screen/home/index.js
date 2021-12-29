@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableWithoutFeedback, FlatList, StatusBar, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StatusBar, Modal, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
 
 import { colors, p } from '../../styles';
 import { SelectModal, Content, Icon, RatingFixed } from '../../components';
@@ -12,6 +12,9 @@ import { categorias } from './categorias'
 import FastImage from 'react-native-fast-image'
 
 import { connect } from 'react-redux';
+import firebase from 'react-native-firebase';
+import reactotron from 'reactotron-react-native';
+import { WebView } from 'react-native-webview';
 
 
 
@@ -19,16 +22,21 @@ class Home extends Component {
 
     constructor(props) {
         super(props);
-
+        
+        this.advert = firebase.admob().rewarded('ca-app-pub-2527516909569780/6748013278');
+        // this.bannerRequest = 
         this.state = {
             arr: [],
-            selectedCategoria: this.props.favorito ? this.props.favorito : null,
+            selectedCategoria: null,
+            selectedCategoriaBefore: null,
+            selectedCatType: null,
             location: null,
             loading: false,
             itemsCount: 10,
-            modalVisible: this.props.favorito || !global.network.isConnected ? false : true,
+            modalVisible: true,
             change: 0,
-            heart: false
+            heart: false,
+            showSelector: true,
         }
 
     }
@@ -36,63 +44,91 @@ class Home extends Component {
     componentDidMount() {
         let location = `${global.geolocation.lat}, ${global.geolocation.lng}`;
         this.setState({ location });
-        if (this.props.favorito) {
-            if (global.network.isConnected) {
-                this.getData(`${global.geolocation.lat}, ${global.geolocation.lng}`, this.props.favorito.type);
-            } else {
-                let favs = global.user.favoritos;
-                let id = this.props.favorito.id;
-                let index = favs.indexOf(id);
-                this.setState({ arr: global.user.categorias[index].lista, loading: false, heart: true })
-            }
-        }
+
+        this.advert.on('onRewarded', (event) => {
+            this.setState({ modalVisible: false, loading: true, selectedCategoria: this.state.selectedCategoriaBefore }, () => {
+                this.getData(`${global.geolocation.lat}, ${global.geolocation.lng}`, this.state.selectedCategoriaBefore.type)
+             }) 
+        });
+
+        this.advert.on('onAdLoaded', (event) => {
+            this.advert.show();
+            this.setState({ selectedCatType: null })
+        });
+    }
+
+    saveLocation() {
+        global.user.saveLocation(global.geolocation.lat, global.geolocation.lng);
+    }
+
+    saveResults(location, type, res) {
+        global.user.saveResults(location, type, res);
     }
 
     getData(location, type) {
-        this.setState({ loading: true });
-        global.maps.getAll(location, type).then(res => {
-            if (res.results.length > 0) {
-                for (let i = 0; i < res.results.length; i++) {
-                    let ref = res.results[i];
-                    let dist = global.geolocation.getDistance(global.geolocation.lat, global.geolocation.lng, ref.geometry.location.lat, ref.geometry.location.lng);
-                    res.results[i].distancia = dist;
-                    if (res.results[i].photos) {
-                        let foto_id = res.results[i].photos[0].photo_reference;
-                        global.maps.getFoto(foto_id).then(ret => {
-                            res.results[i].uri_foto = ret;
-                            if (i == res.results.length - 1) {
-                                setTimeout(() => {
-
-                                    this.setState({ arr: res.results, loading: false, change: this.state.change + 1 })
-                                    let favs = global.user.favoritos;
-                                    let id = this.state.selectedCategoria.id
-                                    if (favs.indexOf(id) != -1) {
-                                        this.setState({ heart: true, change: this.state.change + 1 })
-                                        global.user.updateList(favs.indexOf(id), res.results)
-                                    }
-                                }, 500)
-                            }
-                        }).catch(err => {
-                            console.log('err', err)
-                        })
-                    } else {
-                        if (i == res.results.length - 1) {
-                            setTimeout(() => {
-
-                                this.setState({ arr: res.results, loading: false, change: this.state.change + 1 })
-                                let favs = global.user.favoritos;
-                                let id = this.state.selectedCategoria.id
-                                if (favs.indexOf(id) != -1) {
-                                    this.setState({ heart: true, change: this.state.change + 1 })
-                                    global.user.updateList(favs.indexOf(id), res.results)
-                                }
-                            }, 500)
+        
+        setTimeout(() => {
+            const locations = global.user.locations;
+            if (locations.length) {
+                reactotron.log(`TEM LOCALIZACAO`, locations);
+                for (let i = 0; i < locations.length; i ++) {
+                    const distance = global.geolocation.getDistance(global.geolocation.lat, global.geolocation.lng, locations[i].lat, locations[i].lng);
+                    if (
+                        typeof distance === `string` && 
+                        distance.includes(`km`) && 
+                        parseInt(distance.replace(/\D/g,'') > 5)
+                    ) {
+                        if (i === locations.length - 1) {
+                            reactotron.log(`NOVA LOCALIZACAO`, location);
+                            //percorreu todas as locs e não encontrou nenhuma
+                            //é uma localização diferente da que existe salva.
+                            this.saveLocation();
+                            this.getAll(location, type);
                         }
+                    } else {
+                        //Ja salvou uma localização aproximada antes.
+                        //Verificar no array de resultados se possui alguma lista com a categoria selecionada e a localizacao.
+                        const results = global.user.results;
+                        reactotron.log(`JA TEM ESSA LOC RESULTS`, results, type);
+                        if (results.length) {
+                            for (let j = 0; j < results.length; j++) {
+                                if (results[j].location === `${locations[i].lat}, ${locations[i].lng}` && results[j].type === type) {
+                                    //Encontrou resultados salvos anteriormente.
+                                    this.setState({ arr: results[j].data, loading: false, change: this.state.change + 1 });
+                                    break;
+                                } else {
+                                    if (j === results.length - 1) {
+                                        reactotron.log(`J`, j, `res.l`, results.length)
+                                        //percorreu todas as locs e não encontrou nenhuma
+                                        //é uma localização diferente da que existe salva.
+                                        this.getAll(`${locations[i].lat}, ${locations[i].lng}`, type);
+                                    }
+                                }
+                            }
+                        } else {
+                            //Não tem nenhum resultado, deve pegar da API
+                            this.getAll(location, type);
+                        }
+
+                        break;
                     }
                 }
             } else {
+                reactotron.log(`NAO TEM LOCATIONS`)
+                this.saveLocation();
+                this.getAll(location, type);
+            }
+        }, 200);
+    }
+
+    getAll(location, type) {
+        global.maps.getAll(location, type).then(res => {
+            if (res.results.length > 0) {
+                this.setState({ arr: res.results, loading: false, change: this.state.change + 1 })
+            } else {
                 this.setState({ loading: false, arr: [] })
             }
+            this.saveResults(location, type, res.results);
         }).catch(err => {
             this.setState({ loading: false })
             console.log('errrr', err)
@@ -100,60 +136,21 @@ class Home extends Component {
         })
     }
 
-    atualiza(categoria) {
-        this.setState({ selectedCategoria: categoria, heart: false, arr: [] })
-        this.getData(`${global.geolocation.lat}, ${global.geolocation.lng}`, categoria.type)
-    }
-
-    favoritar() {
-        global.user.favoritarCategoria(this.state.selectedCategoria, this.state.arr);
-        this.setState({ heart: !this.state.heart })
-        this.props.getFavoritos();
-    }
 
     abreRota(item) {
         global.geolocation.abreRota(global.geolocation.lat, global.geolocation.lng, item.geometry.location.lat, item.geometry.location.lng)
     }
 
-    _onEnd() {
-        if (this.state.itemsCount == 10) {
-            this.setState({ itemsCount: 20, change: this.state.change + 1 })
-        }
-    }
-
-    _onRefresh() {
-        this.setState({ itemsCount: 10 })
-    }
-
     _renderItem = ({ item, index }) => {
+        const distancia = global.geolocation.getDistance(global.geolocation.lat, global.geolocation.lng, item.geometry.location.lat, item.geometry.location.lng);
         return (
-            <TouchableWithoutFeedback onPress={() => {
-                this.setState({ detailPress: true })
-                Actions.detalhesEstabelecimento({ item, icon: this.state.selectedCategoria.icon })
-            }}>
+            <TouchableWithoutFeedback>
                 <View style={[p.p8, p.mv8, p.row]}>
 
-                    <View style={[{ width: 100, height: 165, borderRadius: 8 }, p.ovfHidden]}>
-                        {item.uri_foto ?
-
-                            global.network.isConnected ?
-                                <FastImage
-                                    style={{ width: '100%', height: '100%', flex: 1 }}
-                                    source={{
-                                        uri: item.uri_foto,
-                                        priority: FastImage.priority.high,
-                                    }}
-                                    resizeMode={FastImage.resizeMode.cover}
-                                />
-                                :
-                                <View style={[p.aiCenter, p.jCenter, { backgroundColor: colors.grey, height: "100%" }]}>
-                                    <Icon name={this.state.selectedCategoria.icon} type='FontAwesome5' size={24} style={[p.tcWhite]} />
-                                </View>
-                            :
-                            <View style={[p.aiCenter, p.jCenter, { backgroundColor: colors.grey, height: "100%" }]}>
+                    <View style={[{ width: 100, borderRadius: 8 }, p.ovfHidden]}>
+                            <View style={[p.aiCenter, p.jCenter, { backgroundColor: colors.grey, flex: 1}]}>
                                 <Icon name={this.state.selectedCategoria.icon} type='FontAwesome5' size={24} style={[p.tcWhite]} />
                             </View>
-                        }
                     </View>
                     <View style={[p.ml8, p.f1]}>
                         <View style={[p.f1]}>
@@ -161,7 +158,7 @@ class Home extends Component {
                                 <Text numberOfLines={2} style={[p.fsDef, p.ffBold, p.mr8, p.f1]}>{item.name}</Text>
                                 <View style={[p.row, p.aiCenter, p.mv4]}>
                                     <Icon name='route' type='FontAwesome5' size={16} style={[p.tcDark]} />
-                                    <Text style={[p.ml8]}>{item.distancia}</Text>
+                                    <Text style={[p.ml8]}>{distancia}</Text>
                                 </View>
                                 {item.user_ratings_total &&
                                     <View style={[p.row, p.aiCenter]}>
@@ -169,7 +166,7 @@ class Home extends Component {
                                         <Text>{`(${item.user_ratings_total})`}</Text>
                                     </View>
                                 }
-                                <Text numberOfLines={1} style={[p.mr8]}>{item.vicinity}</Text>
+                                <Text style={[p.mr8]}>{item.vicinity}</Text>
                                 {item.opening_hours && global.network.isConnected &&
                                     <Text style={{ color: item.opening_hours.open_now ? colors.greennew : colors.rednew }}>{item.opening_hours.open_now ? 'Aberto' : 'Fechado'}</Text>
                                 }
@@ -193,41 +190,33 @@ class Home extends Component {
     _renderHeader() {
         if (!this.state.selectedCategoria && global.network.isConnected) {
             return (
-                <Text style={[p.fsDef, p.ffBold, p.mt12, p.ml8]}>Selecione uma categoria</Text>
+                <Text style={[p.fsDef, p.ffBold, p.mt12, { marginLeft: 16 }]}>Selecione uma categoria</Text>
             )
         }
         if (this.state.arr.length == 0 && !this.state.loading && global.network.isConnected) {
             return (
-                <Text style={[p.fsDef, p.ffBold, p.mt12, p.ml8]}>Nenhum resultado encontrado</Text>
-            )
-        }
-        if (this.state.selectedCategoria && !this.state.loading) {
-            return (
-                <View style={[p.row, p.jBetween, p.aiCenter, p.ph8, !global.network.isConnected ? { marginTop: 12 } : {}]}>
-                    <TouchableWithoutFeedback onPress={() => this.favoritar()}>
-                        <View style={[p.row, p.aiCenter]}>
-                            <Text style={[p.fsDef, p.ffBold]}>{this.state.heart ? "Favorito" : "Favoritar"}</Text>
-                            <Icon name={'heart'} type={this.state.heart ? "FontAwesome" : "FontAwesome5"} size={22} style={{ color: this.state.heart ? colors.rednew : colors.dark, marginLeft: 4 }} />
-                        </View>
-                    </TouchableWithoutFeedback>
-                    {!this.state.heart &&
-                        <TouchableWithoutFeedback onPress={() => global.alert.alert('Favoritar uma categoria permite que você veja os dados dessa busca mesmo quando estiver sem internet.', () => { }, 'Sobre')}>
-                            <View style={[p.aiCenter, p.jCenter, p.p4]}>
-                                <Icon name={'info-circle'} type="FontAwesome5" size={22} style={{ color: colors.black, marginRight: 4 }} />
-                            </View>
-                        </TouchableWithoutFeedback>
-                    }
-                </View>
-            )
-        }
-        if (!this.state.selectedCategoria && !global.network.isConnected) {
-            return (
-                <Text style={[p.fsDef, p.ffBold, p.mt12, p.ml8]}>Você está offline, caso tenha favoritado alguma categoria, você pode ver os dados das últimas pesquisas na aba Favoritos</Text>
+                <Text style={[p.fsDef, p.ffBold, p.mt12, { marginLeft: 16 }]}>Nenhum resultado encontrado</Text>
             )
         }
         return (
             <View />
         )
+    }
+
+    renderBanner() {
+        const Banner = firebase.admob.Banner;
+        const AdRequest = firebase.admob.AdRequest;
+        const request = new AdRequest();
+        if (this.state?.selectedCategoria?.type) {
+            request.addKeyword(this.state.selectedCategoria.type);
+        }
+        return (
+            <Banner
+              unitId={`ca-app-pub-2527516909569780/7695592426`}
+              size={"SMART_BANNER"}
+              request={request.build()}
+            />
+          );
     }
 
     render() {
@@ -244,6 +233,7 @@ class Home extends Component {
             >
                 <StatusBar backgroundColor={colors.primary} barStyle='light-content' />
 
+
                 <Modal
                     visible={this.state.modalVisible}
                 >
@@ -252,36 +242,78 @@ class Home extends Component {
                         onClose={() => {
                             this.setState({ modalVisible: false });
                         }}
-                        filtrar={(obj) => { this.atualiza(obj), this.setState({ modalVisible: false }) }}
+                        filtrar={(obj) => { 
+                            this.setState({selectedCategoriaBefore: obj, selectedCatType: obj.type })
+                            const AdRequest = firebase.admob.AdRequest;
+                            const request = new AdRequest();
+                            request.addKeyword(obj.type);
+                            this.advert.loadAd(request.build());
+                        }}
+                        selectedCatType={this.state.selectedCatType}
                     />
                 </Modal>
 
-                {global.network.isConnected &&
-                    <View style={[p.row, p.aiCenter, p.p8, p.jBetween]}>
-                        <TouchableWithoutFeedback onPress={() => this.setState({ modalVisible: true })}>
-                            <View style={[p.f1, p.row, p.aiCenter, p.jBetween, p.bgcGreyLight, p.p8, p.mt16, p.mh8, p.bRad8, p.mb8]}>
+                {this.state.showSelector &&
+                    <TouchableOpacity onPress={() => {
+                        setTimeout(() => {
+                            this.setState({ modalVisible: true })
+                        }, 100)
+                    }}>
+                        <View style={[p.row, p.aiCenter, p.p8, p.jBetween]}>
+                            <View style={[p.f1, p.row, p.aiCenter, p.jBetween, p.bgcGreyLight, p.p8, p.mh8, p.bRad8]}>
                                 <Text style={[p.fsDef, p.ffBold]}>{this.state.selectedCategoria ? this.state.selectedCategoria.nome : 'Selecione'}</Text>
                                 <Icon name={'caret-down'} type="FontAwesome5" size={22} style={{ color: colors.black }} />
                             </View>
-                        </TouchableWithoutFeedback>
-                    </View>
+                        </View>
+                    </TouchableOpacity>
                 }
+                {/* <WebView 
+                source={{ uri: 'www.google.com/search?q=restaurantes+perto+de+mim&tbm=lcl' }}
+                geolocationEnabled={true}
+                style={{ width: `100%`, height: `100%` }}
+                injectedJavaScriptBeforeContentLoaded="var markup = document.getElementsByClassName('VkpGBb');
+                alert(markup[0]);"
+                onMessage={event => reactotron.log('Received: ', event.nativeEvent.data)}
+                // rl_tile-group
+                // onNavigationStateChange={(navState) => {
+                //     // reactotron.log(`NAV STATE`, navState)
+                //     if (navState.url.includes(`#`)) {
+                //         if (this.state.showSelector) {
+                //             setTimeout(() => {
+                //                 this.setState({ showSelector: false })
+                //             }, 500)
+                //         }
+                //     } else {
+                //         if (!this.state.showSelector) {
+                //             setTimeout(() => {
+                //                 this.setState({ showSelector: true })
+                //             }, 500)
+                //         }
+                //     }
+                //     // Keep track of going back navigation within component
+                //     // this.canGoBack = navState.canGoBack;
+                //   }}
+                /> */}
+                {/* /search?client=safari&rls=en&tbs=lf:1,lf_ui:9&tbm=lcl&sxsrf=AOaemvJnt6v-j_Z6dGinXwLcZh46df2nEg:1640706973019&q=padarias+perto+de+mim&rflfq=1&num=10&sa=X&ved=2ahUKEwj4ibri7Yb1AhXpqJUCHbkvAfwQjGp6BAgDEFE */}
 
-                <FlatList
-                    data={this.state.arr.slice(0, this.state.itemsCount)}
-                    renderItem={this._renderItem}
-                    ListHeaderComponent={() => this._renderHeader()}
-                    onEndReached={() => this._onEnd()}
-                    onEndReachedThreshold={0.01}
-                    onRefresh={() => this._onRefresh()}
-                    refreshing={this.state.loading}
-                    showsVerticalScrollIndicator={false}
-                    initialNumToRender={20}
-                    removeClippedSubviews={true}
-                    maxToRenderPerBatch={20}
-                    legacyImplementation={true}
-                    extraData={this.state.change}
-                />
+                {this.state.loading ? 
+                    <ActivityIndicator style={{ marginTop: 16 }} size={'large'} color={`black`} />
+                    :
+                    <FlatList
+                        data={this.state.arr}
+                        renderItem={this._renderItem}
+                        ListHeaderComponent={() => this._renderHeader()}
+                        refreshing={this.state.loading}
+                        showsVerticalScrollIndicator={false}
+                        initialNumToRender={5}
+                        removeClippedSubviews={true}
+                        maxToRenderPerBatch={5}
+                        legacyImplementation={true}
+                        extraData={this.state.change}
+                    />
+                }
+                {!this.state.modalVisible && !this.state.loading ? this.renderBanner() : <View /> }
+
 
             </Content >
 

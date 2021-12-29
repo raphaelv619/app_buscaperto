@@ -17,13 +17,13 @@ export default class BemVindo extends Component {
                 noHeader
                 barStyle={'light-content'}
                 color={colors.primary}
-                style={[p.f1, { backgroundColor: colors.primary }]}
+                style={[p.f1, { backgroundColor: colors.primary}, p.jCenter, p.aiCenter]}
                 noScroll
             >
 
                 <StatusBar backgroundColor={colors.primary} barStyle='light-content' />
 
-                <View style={[p.f1, p.pt16]}>
+                <View style={[p.f1, p.pt16, p.jCenter]}>
 
                     <Image
                         style={[p.mt0, { alignSelf: 'center' }]}
@@ -40,15 +40,16 @@ export default class BemVindo extends Component {
                     <Button
                         backgroundColor={colors.secondary}
                         textColor={colors.black}
-                        text="Cadastre-se"
+                        text="Entrar"
                         marginHorizontal={12}
                         marginTop={24}
                         height={50}
+                        paddingHorizontal={18}
                         ffBold
-                        onPress={() => Actions.signin()}
+                        onPress={() => Actions.reset('drawerMenu')}
                     />
 
-                    <Text style={[{ color: colors.whiteD }, p.mt12, p.fsDef, p.tCenter]}>Já tem conta?</Text>
+                    {/* <Text style={[{ color: colors.whiteD }, p.mt12, p.fsDef, p.tCenter]}>Já tem conta?</Text>
 
                     <Button
                         backgroundColor={'rgba(255,255,255,0.1)'}
@@ -58,7 +59,7 @@ export default class BemVindo extends Component {
                         marginTop={12}
                         height={50}
                         onPress={() => Actions.login()}
-                    />
+                    /> */}
 
                 </View>
 

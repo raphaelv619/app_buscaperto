@@ -7,7 +7,7 @@ const BASEDIR = DEBUG ? BASEDIR_DEV : BASEDIR_PRO;
 var config = {
     debug: DEBUG,
     basedir: BASEDIR,
-    key: 'AIzaSyD6FCqQYJddEjieJv1uFg8Vw_xQ4DIc9E8',
+    key: 'AIzaSyDTTFc2M6ntc51WWmbm3q0RyikjFn_g2dQ',
     bancoFirebase: DEBUG ? 'developer' : 'production'
 }
 

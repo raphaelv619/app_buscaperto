@@ -46,7 +46,7 @@ class GeolocationMeta {
 
     abreRota = (latI, lngI, latF, lngF) => {
         LaunchNavigator.navigate([latF, lngF], {
-            start: `${latI}, ${lngI}`,
+            // start: `${latI}, ${lngI}`,
             transportMode: 'driving'
         }).then(res => {
             

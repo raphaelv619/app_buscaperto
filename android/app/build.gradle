@@ -132,8 +132,8 @@ android {
         applicationId "com.buscaperto"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "3.0"
         multiDexEnabled true
     }
     splits {
@@ -151,15 +151,21 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            // You need to specify either an absolute path or include the
+            // keystore file in the same directory as the build.gradle file.
+            storeFile file("buscaperto.keystore")
+            storePassword "123456"
+            keyAlias "buscaperto"
+            keyPassword "123456"
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
-        release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+         release {
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -207,6 +213,7 @@ dependencies {
     implementation "com.google.firebase:firebase-database:17.0.0"
     implementation "com.google.firebase:firebase-auth:17.0.0"
     implementation "com.google.firebase:firebase-storage:17.0.0"
+    implementation "com.google.firebase:firebase-ads:17.2.1"
 
     implementation 'com.android.support:multidex:2.0.1'
 

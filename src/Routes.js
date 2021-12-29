@@ -22,13 +22,13 @@ export default props => (
 
         <Scene key="root" hideNavBar>
 
-            <Stack key="stack0" hideNavBar>
+            {/* <Stack key="stack0" hideNavBar>
                 <Scene key='bemvindo' hideDrawerButton component={Bemvindo} hideNavBar />
                 <Scene key='login' hideDrawerButton component={Login} hideNavBar />
                 <Scene key='signin' hideDrawerButton component={Signin} hideNavBar />
                 <Scene key='signin2' hideDrawerButton component={Signin2} hideNavBar />
                 <Scene key='forgotPassword' hideDrawerButton component={ForgotPassword} hideNavBar />
-            </Stack>
+            </Stack> */}
 
             <Scene
                 drawer
@@ -38,7 +38,7 @@ export default props => (
                 drawerWidth={null}
                 drawerPosition='left'
             >
-                <Stack key="stack1" hideNavBar>
+                <Stack key="stack0" hideNavBar>
                    
                     <Scene key='home' hideDrawerButton component={Home} hideNavBar  />
                     <Scene key='detalhesEstabelecimento' hideDrawerButton component={DetalhesEstabelecimento} hideNavBar />

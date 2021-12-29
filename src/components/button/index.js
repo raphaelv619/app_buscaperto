@@ -27,6 +27,7 @@ export const Button = (props) => {
         button = false,
         noAnimation = false,
         marginHorizontal=0,
+        paddingHorizontal=0,
         marginTop = 0,
         ffBold
     } = props
@@ -34,7 +35,7 @@ export const Button = (props) => {
     if (iconLeft == true || iconRight == true || iconCenter == true) flexDirection = 'row'
 
     return (
-        <View style={[{ marginBottom: marginBottom, marginHorizontal: marginHorizontal, marginTop: marginTop  }]}>
+        <View style={[{ marginBottom: marginBottom, marginHorizontal: marginHorizontal, marginTop: marginTop, paddingHorizontal: paddingHorizontal  }]}>
             <TouchableScale onPress={onPress} style={[]} activeScale={noAnimation ? 1 : 0.9} >
                 <View style={[p.ph8,
                 (outline) ? { borderWidth: 2, borderColor: color, backgroundColor: 'transparent' } : { backgroundColor: backgroundColor },

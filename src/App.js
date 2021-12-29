@@ -12,6 +12,7 @@ import * as util from './util';
 import Loading from './components/loading';
 
 import { PermissionsAndroid, Platform, View } from 'react-native';
+import firebase from 'react-native-firebase';
 
 
 class App extends Component {
@@ -58,16 +59,9 @@ class App extends Component {
 
     componentDidMount() {
         console.disableYellowBox = true;
+        firebase.admob().initialize("ca-app-pub-2527516909569780~7355367998");
         global.bootstrap.init().then((res) => {
-            if(global.user.uuid){
-                if (global.network.isConnected){
-                    Actions.reset("drawerMenu");
-                } else {
-                    Actions.replace('favoritos')
-                }
-            } else {
-                Actions.reset("stack0");
-            }
+            // Actions.reset("drawerMenu");
         }).catch((err) => {
             console.log("bootstrap error", err);
         });

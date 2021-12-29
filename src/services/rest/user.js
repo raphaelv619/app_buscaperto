@@ -4,6 +4,8 @@ class User {
     myprofile = {};
     categorias = [];
     favoritos = [];
+    locations = [];
+    results = [];
 
     init() {
         let dbdata = global.db.get("user");
@@ -12,12 +14,14 @@ class User {
             if (dbdata.myprofile) this.myprofile = dbdata.myprofile;
             if (dbdata.categorias) this.categorias = dbdata.categorias;
             if (dbdata.favoritos) this.favoritos = dbdata.favoritos;
+            if (dbdata.locations) this.locations = dbdata.locations;
+            if (dbdata.results) this.results = dbdata.results;
         }
         global.store.dispatch(modificaCampo("", "INIT_USER", ""));
     }
 
     syncDb() {
-        global.db.set("user", { uuid: this.uuid, myprofile: this.myprofile, categorias: this.categorias, favoritos: this.favoritos });
+        global.db.set("user", { uuid: this.uuid, myprofile: this.myprofile, categorias: this.categorias, favoritos: this.favoritos, locations: this.locations, results: this.results });
     }
 
     updateProfile(fields) {
@@ -27,9 +31,9 @@ class User {
     }
 
     logout() {
-        this.uuid = null;
-        global.store.dispatch(modificaCampo("", "CLEAN_USER", ""));
-        this.syncDb();
+        // this.uuid = null;
+        // global.store.dispatch(modificaCampo("", "CLEAN_USER", ""));
+        // this.syncDb();
     }
 
     favoritarCategoria(categoria, lista) {
@@ -55,6 +59,18 @@ class User {
             this.favoritos.push(categoria.id)
             this.categorias.push(obj);
         }
+        this.syncDb();
+    }
+
+    saveLocation(lat, lng) {
+        const location = { lat, lng };
+        this.locations.push(location);
+        this.syncDb();
+    }
+
+    saveResults(location, type, res) {
+        const result = { location, type, data: res };
+        this.results.push(result);
         this.syncDb();
     }
 

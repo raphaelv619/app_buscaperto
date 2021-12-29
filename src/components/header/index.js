@@ -17,19 +17,19 @@ class Header extends Component {
 
     _menuLeft() {
 
+        return (
+            <TouchableWithoutFeedback>
+
+                <View style={[styles.btnHead, p.jStart]}>
+
+                    <Icon name='search' size={22} style={{ color: this.props.color ? this.props.color : colors.white }} />
+
+                </View>
+
+            </TouchableWithoutFeedback>
+        );
         if (this.props.hasOwnProperty("menu") && this.props.menu) {
 
-            return (
-                <TouchableWithoutFeedback onPressOut={() => { Actions.drawerOpen() }}>
-
-                    <View style={[styles.btnHead, p.jStart]}>
-
-                        <Icon name='menu-three-horizontal-lines-symbol' size={22} style={{ color: this.props.color ? this.props.color : colors.white }} />
-
-                    </View>
-
-                </TouchableWithoutFeedback>
-            );
 
         }
 
@@ -132,27 +132,10 @@ class Header extends Component {
                 <View style={[p.row, p.bgcSecondary, { height: 60 }, this.props.headerStyles ? this.props.headerStyles : {},]}>
                     <View style={[p.pl16]}>
                         <View style={[p.f1, p.jCenter]}>
-                            <TouchableWithoutFeedback onPress={() => { Actions.drawerOpen() }}>
-                                <View style={[p.jStart]}>
-                                    <Icon name='bars' type="FontAwesome5" size={22} style={{ color: '#fff' }} />
-                                </View>
-                            </TouchableWithoutFeedback>
-                        </View>
-                    </View>
-                    <View style={[p.f1, p.aiCenter]}>
-
-                    </View>
-                    <View style={[p.pr16]}>
-                        <View style={[p.f1, p.jCenter]}>
-                            <TouchableWithoutFeedback onPress={() => Actions.edit()}>
-                                <View style={[p.jStart]}>
-                                    <View style={[p.aiCenter, p.jCenter, { width: 35, height: 35, borderRadius: 100 }, p.ovfHidden]}>
-                                        {this.props.foto != '' ?
-                                            <Image resizeMode='cover' style={[p.f1, { width: '100%', height: '100%' }]} source={{ uri: this.props.foto }} />
-                                            :
-                                            <Image resizeMode='contain' style={[p.f1, { width: '100%', height: '100%' }]} source={require('../../assets/images/man.png')} />
-                                        }
-                                    </View>
+                            <TouchableWithoutFeedback>
+                                <View style={[p.jStart, { flexDirection: `row`, alignItems: `center` }]}>
+                                    <Icon name='search' type="FontAwesome5" size={18} style={{ color: '#fff' }} />
+                                    <Text style={{ color: `white`, fontSize: 16, fontWeight: `bold`, marginLeft: 16 }} >Resultados</Text>
                                 </View>
                             </TouchableWithoutFeedback>
                         </View>

@@ -4,7 +4,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
@@ -33,9 +32,10 @@
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
       <meta-data
-          android:name="com.google.android.geo.API_KEY"
-          android:value="AIzaSyD6FCqQYJddEjieJv1uFg8Vw_xQ4DIc9E8"
+          android:name="com.google.android.gms.ads.APPLICATION_ID"
+          android:value="ca-app-pub-2527516909569780~7355367998"
       />
+      <uses-library android:name="org.apache.http.legacy" android:required="false"/>
     </application>
 
 </manifest>

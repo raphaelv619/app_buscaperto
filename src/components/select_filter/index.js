@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, FlatList, TouchableWithoutFeedback, ImageBackground } from 'react-native';
+import { View, Text, ActivityIndicator, FlatList, TouchableOpacity, ImageBackground } from 'react-native';
 import { Icon } from "../icon";
 import { Form, Input, Item } from "native-base";
 import { fonts, colors, p } from '../../styles';
+import reactotron from 'reactotron-react-native';
 export class SelectModal extends Component {
     state = {
-        loading: true,
+        loading: false,
         busca: "",
-        items: []
-    }
-
-    componentWillMount() {
-        this.updateComponent();
+        items: this.props.items,
+        selectedCatType: null
     }
 
     removeAcento(newStringComAcento) {
@@ -63,14 +61,14 @@ export class SelectModal extends Component {
     timeout = null;
 
     buscar(busca) {
-        this.setState({ busca }, () => {
+        this.setState({ busca, loading: true }, () => {
             if (this.timeout != null) {
                 clearTimeout(this.timeout);
             }
 
             this.timeout = setTimeout(() => {
                 this._onRefresh();
-            }, 1000);
+            }, 300);
         });
     }
 
@@ -89,23 +87,36 @@ export class SelectModal extends Component {
 
     _renderItem = ({ item, index }) => {
         return (
+            <TouchableOpacity 
+            style={{ flex: 1, height: 100, justifyContent: 'center', margin: 5, borderRadius: 8, overflow: 'hidden' }}
+            onPress={() => {
+                if (!this.props.selectedCatType) {
+                    this._onPressItem(item)
+                }
+            }}
+            >
             <ImageBackground
                 resizeMode='cover'
                 // source={{ uri: this.state.item.uri_foto }}
                 imageStyle={{ width: '100%', height: '100%', flex: 1 }}
-                style={{ flex: 1, height: 100, justifyContent: 'center', margin: 5, borderRadius: 8, overflow: 'hidden' }}
+                style={{ flex: 1, height: 100, justifyContent: 'center' }}
                 source={item.img}
             >
-
-                <TouchableWithoutFeedback onPress={() => this._onPressItem(item)}>
+                
+                    {this.props.selectedCatType === item.type ? 
                     <View style={[{ backgroundColor: 'rgba(0,0,0,0.6)', flex: 1, justifyContent: 'center', alignItems: 'center' }]}>
-                        <Icon name={item.icon} type='FontAwesome5' size={16} style={[p.tcWhite, p.ml4]} />
-                        <Text style={{ fontFamily: fonts.montBold, fontSize: fonts.default, marginLeft: 4, color: colors.white, textAlign: "center" }}>
-                            {item.nome}
-                        </Text>
+                        <ActivityIndicator color={`white`} size={`large`} />
                     </View>
-                </TouchableWithoutFeedback>
+                    :
+                    <View style={[{ backgroundColor: 'rgba(0,0,0,0.6)', flex: 1, justifyContent: 'center', alignItems: 'center' }]}>
+                    <Icon name={item.icon} type='FontAwesome5' size={16} style={[p.tcWhite, p.ml4]} />
+                    <Text style={{ fontFamily: fonts.montBold, fontSize: fonts.default, marginLeft: 4, color: colors.white, textAlign: "center" }}>
+                        {item.nome}
+                    </Text>
+                </View>
+                    }
             </ImageBackground>
+                </TouchableOpacity>
 
         )
     }
@@ -141,24 +152,32 @@ export class SelectModal extends Component {
                                 />
                             </Item>
 
-                            <TouchableWithoutFeedback onPress={() => this.props.onClose()}>
+                            <TouchableOpacity onPress={() => {
+                                setTimeout(() => {
+                                    this.props.onClose()
+                                }, 100)
+                            }}>
                                 <View style={{ paddingHorizontal: 16 }}>
                                     <Icon name={'times'} type={'FontAwesome5'} size={16} />
                                 </View>
-                            </TouchableWithoutFeedback>
+                            </TouchableOpacity>
                         </View>
                     </Form>
-                    <Text style={[p.ml8, p.fsDef, p.mb8]}>Selecione uma categoria</Text>
-                    <FlatList
-                        data={items}
-                        numColumns={2}
-                        refreshing={loading}
-                        onRefresh={() => this._onRefresh()}
-
-                        renderItem={(data, index) => this._renderItem(data, index)}
-                        ListEmptyComponent={this._renderEmpty}
-
-                    />
+                    {this.state.loading ? 
+                    <ActivityIndicator color={`black`} size={`large`} />
+                    :
+                    <View style={{ flex: 1 }}>
+                        {items.length ? <Text style={[p.ml8, p.fsDef, p.mb8]}>Selecione uma categoria</Text> : <View />}
+                        
+                        <FlatList
+                            keyboardShouldPersistTaps={`always`}
+                            data={items}
+                            numColumns={2}
+                            renderItem={(data, index) => this._renderItem(data, index)}
+                            ListEmptyComponent={this._renderEmpty}
+                        />
+                    </View>
+                    }
                 </View>
             </View>
         )

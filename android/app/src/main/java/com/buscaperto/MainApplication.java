@@ -15,6 +15,7 @@ import java.util.List;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
 import io.invertase.firebase.storage.RNFirebaseStoragePackage;
+import io.invertase.firebase.admob.RNFirebaseAdMobPackage;
 
 import androidx.multidex.MultiDexApplication;
 
@@ -36,6 +37,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
           packages.add(new RNFirebaseDatabasePackage());
           packages.add(new RNFirebaseAuthPackage());
           packages.add(new RNFirebaseStoragePackage());
+          packages.add(new RNFirebaseAdMobPackage());
           return packages;
         }
 
